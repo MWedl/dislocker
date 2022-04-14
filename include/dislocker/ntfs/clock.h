@@ -36,6 +36,7 @@ typedef uint64_t ntfs_time_t;
  * Prototypes of functions from clock.c
  */
 void ntfs2utc(ntfs_time_t t, time_t *ts);
+void utc2ntfs(time_t t, ntfs_time_t *ts);
 
 
 #endif /* CLOCK_H */

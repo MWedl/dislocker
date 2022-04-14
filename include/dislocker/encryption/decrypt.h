@@ -47,6 +47,16 @@ int decrypt_key(
 	void** output
 );
 
+int encrypt_key(
+        const unsigned char* input,
+        unsigned int input_size,
+        const unsigned char* key,
+        unsigned int keybits,
+        const unsigned char* nonce,
+        unsigned char* mac,
+        void** output
+);
+
 void decrypt_cbc_without_diffuser(
 	dis_aes_contexts_t* ctx,
 	uint16_t sector_size,

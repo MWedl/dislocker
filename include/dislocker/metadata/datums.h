@@ -322,6 +322,7 @@ int get_next_datum(
 );
 
 int get_nested_datum(void* datum, void** datum_nested);
+int get_nested_datum2(void* datum, void* datum_nested_begin, void** datum_nested);
 int get_nested_datumvaluetype(void* datum, dis_datums_value_type_t value_type, void** datum_nested);
 
 int datum_value_type_must_be(void* datum, dis_datums_value_type_t value_type);

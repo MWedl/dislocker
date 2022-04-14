@@ -39,3 +39,17 @@ void ntfs2utc(ntfs_time_t t, time_t *ts)
 
 	*ts = (time_t) ((t - (uint64_t)(NTFS_TIME_OFFSET)) / (uint64_t)10000000 );
 }
+
+/**
+ * Convert a utc timestamp into a ntfs one
+ *
+ * @param t NTFS timestamp
+ * @param ts UTC timestamp
+ */
+void utc2ntfs(time_t t, ntfs_time_t *ts)
+{
+    if (ts == NULL)
+        return;
+
+    *ts = (ntfs_time_t)(((uint64_t)t * (uint64_t)10000000) + (uint64_t)(NTFS_TIME_OFFSET));
+}

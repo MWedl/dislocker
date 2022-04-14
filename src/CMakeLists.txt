@@ -63,7 +63,7 @@ set (SOURCES
 		encryption/diffuser.c encryption/crc32.c encryption/aes-xts.c
 		ntfs/clock.c ntfs/encoding.c
 		inouts/inouts.c inouts/prepare.c inouts/sectors.c
-	)
+		)
 
 if(NOT DEFINED WARN_FLAGS)
 	set (WARN_FLAGS "-Wall -Wextra" CACHE STRING "" FORCE)
@@ -260,6 +260,12 @@ target_link_libraries (${BIN_BEK} ${PROJECT_NAME})
 set_target_properties (${BIN_BEK} PROPERTIES LINK_FLAGS "-pie -fPIE")
 install (TARGETS ${BIN_BEK} RUNTIME DESTINATION "${bindir}")
 
+set (BIN_PWRESET ${PROJECT_NAME}-pwreset)
+add_executable (${BIN_PWRESET} ${BIN_PWRESET}.c)
+target_link_libraries (${BIN_PWRESET} ${PROJECT_NAME})
+set_target_properties (${BIN_PWRESET} PROPERTIES LINK_FLAGS "-pie -fPIE")
+install (TARGETS ${BIN_PWRESET} RUNTIME DESTINATION "${bindir}")
+
 if(RUBY_FOUND)
 	set (BIN_FIND ${PROJECT_NAME}-find)
 	configure_file ("${CMAKE_CURRENT_SOURCE_DIR}/${BIN_FIND}.rb.in" "${CMAKE_CURRENT_SOURCE_DIR}/${BIN_FIND}.rb" ESCAPE_QUOTES @ONLY)
@@ -289,5 +295,6 @@ add_custom_target(travis-test
 	COMMAND ${BIN_METADATA} -h
 	COMMAND ${BIN_BEK} -h
 	COMMAND ${BIN_FIND} -h
+	COMMAND ${BIN_PWRESET} -h
 	COMMAND man -w dislocker
 )

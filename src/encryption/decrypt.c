@@ -167,6 +167,36 @@ int decrypt_key(
 }
 
 
+int encrypt_key(const unsigned char* input, unsigned int input_size,
+                const unsigned char* key, unsigned int keybits,
+                const unsigned char* nonce, unsigned char* mac,
+                void** output) {
+    if (!input || !key || !nonce || !output || !mac) {
+        return FALSE;
+    }
+
+    *output = dis_malloc(input_size);
+
+    AES_CONTEXT ctx;
+    AES_SETENC_KEY(&ctx, key, keybits);
+
+    aes_ccm_compute_unencrypted_tag(
+            &ctx,
+            (unsigned char *)nonce, 0x0C,
+            (unsigned char *)input, input_size,
+            (unsigned char *)mac);
+
+    aes_ccm_encrypt_decrypt(
+            &ctx,
+            nonce, 0x0C,
+            input, input_size,
+            mac, AUTHENTICATOR_LENGTH,
+            *output);
+
+    return TRUE;
+}
+
+
 
 /**
  * Internal function to decrypt keys

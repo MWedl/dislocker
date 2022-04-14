@@ -202,7 +202,8 @@ int get_header_safe(void* data, datum_header_safe_t* header)
 			header->entry_type, header->value_type, header->error_status);
 
 	/* Now check if the header is good */
-	if(header->datum_size < sizeof(datum_header_safe_t))
+	if(header->datum_size < sizeof(datum_header_safe_t) ||
+       header->value_type > NB_DATUMS_VALUE_TYPES)
 		return FALSE;
 
 	return TRUE;
@@ -582,7 +583,7 @@ int get_next_datum(
 	void** datum_result)
 {
 	// Check parameters
-	if(!dis_meta)
+	if(!dis_meta || (value_type > NB_DATUMS_VALUE_TYPES && value_type != UINT16_MAX))
 		return FALSE;
 
 	dis_printf(L_DEBUG, "Entering get_next_datum...\n");
@@ -653,27 +654,46 @@ int get_next_datum(
  */
 int get_nested_datum(void* datum, void** datum_nested)
 {
-	// Check parameters
-	if(!datum)
-		return FALSE;
-
-	datum_header_safe_t header;
-
-	if(!get_header_safe(datum, &header))
-		return FALSE;
-
-	if(header.value_type > NB_DATUMS_VALUE_TYPES)
-		return FALSE;
-
-	if(!datum_value_types_prop[header.value_type].has_nested_datum)
-		return FALSE;
-
-	uint16_t size = datum_value_types_prop[header.value_type].size_header;
-	*datum_nested = (char*)datum + size;
-
-	return TRUE;
+    return get_nested_datum2(datum, NULL, datum_nested);
 }
 
+/**
+ * Retrieve a datum nested into another one
+ *
+ * @param datum Where to find a nested datum
+ * @param datum_nested The datum resulted
+ * @return TRUE if result can be trusted, FALSE otherwise
+ */
+int get_nested_datum2(void* datum, void* datum_nested_begin, void** datum_nested)
+{
+    // Check parameters
+    if(!datum)
+        return FALSE;
+
+    datum_header_safe_t header;
+    if(!get_header_safe(datum, &header))
+        return FALSE;
+    if(!datum_value_types_prop[header.value_type].has_nested_datum)
+        return FALSE;
+
+    void* output;
+    if (datum_nested_begin == NULL) {
+        uint16_t size = datum_value_types_prop[header.value_type].size_header;
+        output = (char*)datum + size;
+    } else {
+        datum_header_safe_t header_nested;
+        if (!get_header_safe(datum_nested_begin, &header_nested))
+            return FALSE;
+
+        output = datum_nested_begin + header_nested.datum_size;
+    }
+
+    if (datum + header.datum_size <= output)
+        return FALSE;
+
+    *datum_nested = output;
+    return TRUE;
+}
 
 /**
  * Retrieve a datum nested into another one with a specific value type

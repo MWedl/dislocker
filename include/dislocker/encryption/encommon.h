@@ -31,12 +31,14 @@
 enum cipher_types
 {
 	STRETCH_KEY   = 0x1000,
+    STRETCH_KEY_2 = 0x1001,
 	AES_CCM_256_0 = 0x2000,
 	AES_CCM_256_1 = 0x2001,
 	EXTERN_KEY    = 0x2002,
 	VMK           = 0x2003,
 	AES_CCM_256_2 = 0x2004,
 	HASH_256      = 0x2005,
+    USER_KEY      = 0x2007,
 
 	AES_128_DIFFUSER    = 0x8000,
 	AES_256_DIFFUSER    = 0x8001,
