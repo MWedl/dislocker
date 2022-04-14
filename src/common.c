@@ -260,7 +260,7 @@ off_t dis_lseek(int fd, off_t offset, int whence)
  * @param data Data to print
  * @param data_len Length of the data to print
  */
-void hexdump(DIS_LOGS level, uint8_t* data, size_t data_len)
+void hexdump(DIS_LOGS level, const uint8_t* data, size_t data_len)
 {
 	size_t i, j, max = 0;
 	size_t offset = 16;
@@ -286,20 +286,12 @@ void hexdump(DIS_LOGS level, uint8_t* data, size_t data_len)
  * @param buf1 The first buffer to xor
  * @param buf2 The second buffer to xor
  * @param size The size of the two buffers
- * @param output The resulted xored output (the result is put into buf1 if no output buffer is given)
+ * @param output The resulted xored output
  */
-void xor_buffer(unsigned char* buf1, const unsigned char* buf2, unsigned char* output, size_t size)
+void xor_buffer(const unsigned char* buf1, const unsigned char* buf2, unsigned char* output, size_t size)
 {
-	size_t loop;
-	unsigned char* tmp = NULL;
-
-	if(output)
-		tmp = output;
-	else
-		tmp = buf1;
-
-	for(loop = 0; loop < size; ++loop, ++buf1, ++buf2, ++tmp)
-		*tmp = *buf1 ^ *buf2;
+	for(size_t loop = 0; loop < size; ++loop, ++buf1, ++buf2, ++output)
+		*output = *buf1 ^ *buf2;
 }
 
 

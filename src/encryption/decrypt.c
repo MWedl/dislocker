@@ -34,16 +34,16 @@
  */
 static int aes_ccm_encrypt_decrypt(
 					AES_CONTEXT* ctx,
-					unsigned char* iv, unsigned char iv_length,
-					unsigned char* input, unsigned int input_length,
+					const unsigned char* iv, unsigned char iv_length,
+					const unsigned char* input, unsigned int input_length,
 					unsigned char* mac,   unsigned int mac_size,
 					unsigned char* output
 						   );
 
 static int aes_ccm_compute_unencrypted_tag(
 									AES_CONTEXT* ctx,
-									unsigned char* iv, unsigned char iv_length,
-									unsigned char* buffer, unsigned int buffer_length,
+									const unsigned char* iv, unsigned char iv_length,
+									const unsigned char* buffer, unsigned int buffer_length,
 									unsigned char* mac
 								   );
 
@@ -60,11 +60,11 @@ static int aes_ccm_compute_unencrypted_tag(
  * @return TRUE if result can be trusted, FALSE otherwise
  */
 int decrypt_key(
-	unsigned char* input,
+	const unsigned char* input,
 	unsigned int   input_size,
-	unsigned char* mac,
-	unsigned char* nonce,
-	unsigned char* key,
+	const unsigned char* mac,
+	const unsigned char* nonce,
+	const unsigned char* key,
 	unsigned int   keybits,
 	void** output)
 {
@@ -181,9 +181,9 @@ int decrypt_key(
  */
 static int aes_ccm_encrypt_decrypt(
 					 AES_CONTEXT* ctx,
-					 unsigned char* nonce, unsigned char nonce_length,
-					 unsigned char* input, unsigned int  input_length,
-					 unsigned char* mac,   unsigned int  mac_length,
+					 const unsigned char* nonce, unsigned char nonce_length,
+					 const unsigned char* input, unsigned int  input_length,
+					 unsigned char* mac,         unsigned int  mac_length,
 					 unsigned char* output)
 {
 	// Check parameters
@@ -226,7 +226,7 @@ static int aes_ccm_encrypt_decrypt(
 	dis_printf(L_DEBUG, "\tInput:\n");
 	hexdump(L_DEBUG, mac, mac_length);
 
-	xor_buffer(mac, tmp_buf, NULL, mac_length);
+	xor_buffer(mac, tmp_buf, mac, mac_length);
 
 	dis_printf(L_DEBUG, "\tOutput:\n");
 	hexdump(L_DEBUG, mac, mac_length);
@@ -304,8 +304,8 @@ static int aes_ccm_encrypt_decrypt(
  */
 static int aes_ccm_compute_unencrypted_tag(
 									AES_CONTEXT* ctx,
-									unsigned char* nonce, unsigned char nonce_length,
-									unsigned char* buffer, unsigned int buffer_length,
+									const unsigned char* nonce, unsigned char nonce_length,
+									const unsigned char* buffer, unsigned int buffer_length,
 									unsigned char* mac)
 {
 	// Check parameters
@@ -349,7 +349,7 @@ static int aes_ccm_compute_unencrypted_tag(
 			dis_printf(L_DEBUG, "\tInternal IV:\n");
 			hexdump(L_DEBUG, iv, 16);
 
-			xor_buffer(iv, buffer, NULL, AUTHENTICATOR_LENGTH);
+			xor_buffer(iv, buffer, iv, AUTHENTICATOR_LENGTH);
 
 			AES_ECB_ENC(ctx, AES_ENCRYPT, iv, iv);
 
@@ -364,7 +364,7 @@ static int aes_ccm_compute_unencrypted_tag(
 	 */
 	if(buffer_length)
 	{
-		xor_buffer(iv, buffer, NULL, buffer_length);
+		xor_buffer(iv, buffer, iv, buffer_length);
 		AES_ECB_ENC(ctx, AES_ENCRYPT, iv, iv);
 	}
 

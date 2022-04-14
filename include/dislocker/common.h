@@ -71,9 +71,9 @@ ssize_t dis_read(int fd, void* buf, size_t count);
 ssize_t dis_write(int fd, void* buf, size_t count);
 off_t dis_lseek(int fd, off_t offset, int whence);
 
-void hexdump(DIS_LOGS level, uint8_t* data, size_t data_size);
+void hexdump(DIS_LOGS level, const uint8_t* data, size_t data_size);
 
-void xor_buffer(unsigned char* buf1, const unsigned char* buf2, unsigned char* output, size_t size);
+void xor_buffer(const unsigned char* buf1, const unsigned char* buf2, unsigned char* output, size_t size);
 
 void memclean(void* ptr, size_t size);
 

@@ -38,11 +38,11 @@
  * Prototypes
  */
 int decrypt_key(
-	unsigned char* input,
+	const unsigned char* input,
 	unsigned int   input_size,
-	unsigned char* mac,
-	unsigned char* nonce,
-	unsigned char* key,
+	const unsigned char* mac,
+	const unsigned char* nonce,
+	const unsigned char* key,
 	unsigned int   keybits,
 	void** output
 );
