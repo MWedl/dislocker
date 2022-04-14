@@ -90,7 +90,9 @@ file:
 4. `dislocker-file`: for decrypting a BitLocker encrypted partition into a flat file
 formatted as an NTFS partition you can mount
 
-5. `dislocker-fuse`: the one you're using when calling `dislocker',
+5. `dislocker-pwreset`: for adding passwords and clear keys to BitLocker metadata. One of FVEK, VMK or other key protector is required.
+
+6. `dislocker-fuse`: the one you're using when calling `dislocker',
 which dynamically decrypts a BitLocker encrypted partition using FUSE
 
 You can build each one independently providing it as the makefile target. For
