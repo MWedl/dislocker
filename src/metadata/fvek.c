@@ -66,7 +66,7 @@ int get_fvek(dis_metadata_t dis_meta, void* vmk_datum, void** fvek_datum)
 	{
 		dis_printf(
 			L_CRITICAL,
-			"Error in finding the AES_CCM datum including the VMK. "
+			"Error in finding the AES_CCM datum including the FVEK. "
 			"Internal failure, abort.\n"
 		);
 		return FALSE;
@@ -156,8 +156,6 @@ int build_fvek_from_file(dis_config_t* cfg, void** fvek_datum)
 	if(!cfg)
 		return FALSE;
 
-
-	off_t actual_size   = -1;
 	int   file_fd = -1;
 	datum_key_t* datum_key = NULL;
 	ssize_t rs;
@@ -170,8 +168,6 @@ int build_fvek_from_file(dis_config_t* cfg, void** fvek_datum)
 	memset(enc_method.multi, 0, 2);
 	char fvek_keys[64] = {0,};
 
-	off_t expected_size = sizeof(enc_method) + sizeof(fvek_keys);
-
 
 	file_fd = dis_open(cfg->fvek_file, O_RDONLY);
 	if(file_fd == -1)
@@ -180,19 +176,6 @@ int build_fvek_from_file(dis_config_t* cfg, void** fvek_datum)
 		return FALSE;
 	}
 
-	/* Check the file's size */
-	actual_size = dis_lseek(file_fd, 0, SEEK_END);
-
-	if(actual_size != expected_size)
-	{
-		dis_printf(
-			L_ERROR,
-			"Wrong FVEK file size, expected %d but has %d\n",
-			expected_size,
-			actual_size
-		);
-		return FALSE;
-	}
 
 	/* Read everything */
 	dis_lseek(file_fd, 0, SEEK_SET);
@@ -205,8 +188,26 @@ int build_fvek_from_file(dis_config_t* cfg, void** fvek_datum)
 		);
 		return FALSE;
 	}
-	rs = dis_read(file_fd, fvek_keys,  sizeof(fvek_keys));
-	if(rs != sizeof(fvek_keys))
+
+    size_t key_size;
+    if (enc_method.single == AES_128_DIFFUSER || enc_method.single == AES_128_NO_DIFFUSER) {
+        key_size = 128 / 8;
+    } else if (enc_method.single == AES_256_DIFFUSER || enc_method.single == AES_256_NO_DIFFUSER || enc_method.single == AES_XTS_128) {
+        key_size = 256 / 8;
+    } else if (enc_method.single == AES_XTS_256) {
+        key_size = 512 / 8;
+    } else {
+        dis_printf(
+            L_ERROR,
+            "Invalid FVEK file size. Not a valid cipher: %d\n",
+             enc_method.single
+         );
+         return FALSE;
+     }
+
+
+ 	rs = dis_read(file_fd, fvek_keys, key_size);
+ 	if(rs != (ssize_t)key_size)
 	{
 		dis_printf(L_ERROR, "Cannot read whole FVEK keys in the FVEK file\n");
 		return FALSE;
@@ -214,20 +215,21 @@ int build_fvek_from_file(dis_config_t* cfg, void** fvek_datum)
 
 
 	/* Create the FVEK datum */
-	*fvek_datum = dis_malloc(sizeof(datum_key_t) + sizeof(fvek_keys));
+    *fvek_datum = dis_malloc(sizeof(datum_key_t) + key_size);
 
 	/* ... create the header */
-	datum_key = *fvek_datum;
-	datum_key->header.datum_size = sizeof(datum_key_t) + sizeof(fvek_keys);
+    datum_key = *fvek_datum;
+ 	datum_key->header.datum_size = (uint16_t)(sizeof(datum_key_t) + key_size);
+ 	datum_key->header.entry_type = DATUMS_ENTRY_NONE;
 	datum_key->header.entry_type = 3;
 	datum_key->header.value_type = DATUMS_VALUE_KEY;
-	datum_key->header.error_status = 1;
+	datum_key->header.error_status = 0;
 
 	datum_key->algo = enc_method.single;
 	datum_key->padd = 0;
 
 	/* ... copy the keys */
-	memcpy((char*) *fvek_datum + sizeof(datum_key_t), fvek_keys, sizeof(fvek_keys));
+    memcpy((char*) *fvek_datum + sizeof(datum_key_t), fvek_keys, key_size);
 
 
 	return TRUE;

@@ -77,7 +77,7 @@ typedef uint16_t dis_datums_value_type_t;
 
 enum entry_types
 {
-	DATUMS_ENTRY_UNKNOWN1 = 0x0000,
+	DATUMS_ENTRY_NONE = 0x0000,
 	DATUMS_ENTRY_UNKNOWN2,
 	DATUMS_ENTRY_VMK,
 	DATUMS_ENTRY_FVEK,
@@ -88,7 +88,6 @@ enum entry_types
 	DATUMS_ENTRY_UNKNOWN7,
 	DATUMS_ENTRY_UNKNOWN8,
 	DATUMS_ENTRY_UNKNOWN9,
-	DATUMS_ENTRY_UNKNOWN10,
 	DATUMS_ENTRY_FVEK_2
 };
 typedef uint16_t dis_datums_entry_type_t;

@@ -355,11 +355,11 @@ int get_vmk_from_file(dis_config_t* cfg, void** vmk_datum)
 	/* ... create the header */
 	datum_key = *vmk_datum;
 	datum_key->header.datum_size = sizeof(datum_key_t) + sizeof(vmk_keys);
-	datum_key->header.entry_type = 3;
+	datum_key->header.entry_type = DATUMS_ENTRY_NONE;
 	datum_key->header.value_type = DATUMS_VALUE_KEY;
 	datum_key->header.error_status = 1;
 
-	datum_key->algo = AES_256_DIFFUSER;
+	datum_key->algo = VMK;
 	datum_key->padd = 0;
 
 	/* ... copy the keys */
